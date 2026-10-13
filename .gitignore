@@ -5,3 +5,6 @@ build/
 dist/
 *.spec.bak
 .pytest_cache/
+
+.rundata/
+shots/

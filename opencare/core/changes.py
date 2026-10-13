@@ -103,7 +103,12 @@ class ChangeSet:
 
     @property
     def is_empty(self) -> bool:
-        return not self.operations
+        """No undoable operations AND nothing accounted for (bytes/items)."""
+        return not self.operations and not self.bytes_freed and not self.items
+
+    @property
+    def is_reversible(self) -> bool:
+        return bool(self.operations)
 
 
 def _encode_regval(value: Any) -> Any:

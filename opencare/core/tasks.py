@@ -52,17 +52,25 @@ class _Worker(QRunnable):
 
     def run(self) -> None:
         sig = self._handle._signals
+
+        def safe_emit(signal, *args):
+            # the receiving widgets may be torn down (app closing mid-task); ignore that
+            try:
+                signal.emit(*args)
+            except RuntimeError:
+                pass
+
         try:
             result = self._fn(self._handle, *self._args, **self._kwargs)
             if not self._handle.cancelled:
-                sig.result.emit(result)
+                safe_emit(sig.result, result)
         except TaskCancelled:
             pass
         except Exception as e:  # noqa: BLE001 - surfaced to on_error
             log.exception("task failed")
-            sig.error.emit(e)
+            safe_emit(sig.error, e)
         finally:
-            sig.finished.emit()
+            safe_emit(sig.finished)
 
 
 class Task:
