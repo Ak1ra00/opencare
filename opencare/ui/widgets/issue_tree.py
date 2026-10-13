@@ -22,7 +22,8 @@ RISK_BADGE = {Risk.LOW: ("success", "Safe"), Risk.MEDIUM: ("warning", "Caution")
 
 
 class IssueTree(QTreeWidget):
-    selection_changed = Signal(int, int)  # selected_bytes, selected_count
+    # selected_bytes can exceed 2 GB, so it must be 64-bit, not a C++ int
+    selection_changed = Signal("qlonglong", int)  # selected_bytes, selected_count
     ignore_requested = Signal(object)     # Issue
     exclude_requested = Signal(str)       # path
 

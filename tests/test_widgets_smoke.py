@@ -50,17 +50,19 @@ def test_issue_tree_selection(qapp):
 
             return FixReport(self.id)
 
+    # include an item larger than 2 GB to catch 32-bit signal overflow
+    big = 7_665_326_030
     res = ScanResult("junk", issues=[
         Issue("junk:cache:a", "junk", "cache", "a.tmp", size=1000),
         Issue("junk:cache:b", "junk", "cache", "b.tmp", size=2000),
-        Issue("junk:logs:c", "junk", "logs", "c.log", size=500),
+        Issue("junk:logs:c", "junk", "logs", "c.log", size=big),
     ])
     tree = IssueTree()
     captured = []
     tree.selection_changed.connect(lambda b, c: captured.append((b, c)))
     tree.load(Dummy(), res)
     assert len(tree.all_issues()) == 3
-    assert captured[-1] == (3500, 3)
+    assert captured[-1] == (3000 + big, 3)
     tree.set_all_checked(False)
     assert captured[-1] == (0, 0)
     assert tree.selected_issues() == []
