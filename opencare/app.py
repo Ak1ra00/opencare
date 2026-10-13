@@ -17,6 +17,17 @@ from opencare.ui import icons, theme
 log = logging.getLogger(__name__)
 
 
+def _app_icon():
+    from pathlib import Path
+
+    from PySide6.QtGui import QIcon
+
+    ico = Path(__file__).resolve().parent.parent / "assets" / "opencare.ico"
+    if ico.exists():
+        return QIcon(str(ico))
+    return icons.icon("shield_check", theme.hex_color("accent"), 64)
+
+
 def _set_app_user_model_id():
     try:
         import ctypes
@@ -40,7 +51,7 @@ def main(argv: list[str] | None = None) -> int:
 
     settings = get_settings()
     theme.apply_theme(app, settings["ui.theme"] or "system")
-    app.setWindowIcon(icons.icon("shield_check", theme.hex_color("accent"), 64))
+    app.setWindowIcon(_app_icon())
 
     # react to live system light/dark changes when in "system" mode
     def on_scheme_changed(*_):
